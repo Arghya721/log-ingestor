@@ -15,6 +15,7 @@ export let options = {
     ]
 };
 
+
 // Function to generate a random string
 function generateRandomString(length) {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -67,5 +68,6 @@ export default () => {
     });
 
     // Simulate a delay between requests
-    sleep(0.1);  // 100 milliseconds
-}
+    sleep(0.1); // 100 milliseconds
+};
+

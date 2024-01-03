@@ -11,7 +11,7 @@ type CheckHealthRepository interface {
 type IngestorRepository interface {
 	InsertLog(log domain.Log) error
 	InsertLogWithPreparedStmt(log domain.Log) error
-	InsertBulkLog(logs *[]domain.Log) error
+	InsertBulkLog(logs []domain.Log) error
 }
 
 type IngestorService interface {

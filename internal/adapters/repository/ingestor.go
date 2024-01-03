@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"log-ingestor/internal/core/domain"
+
+	"github.com/labstack/gommon/log"
 )
 
 // InsertLog inserts a log into the database
@@ -32,22 +34,11 @@ func (repo *DB) InsertLogWithPreparedStmt(log domain.Log) error {
 }
 
 // InsertBulkLog inserts a log into the database using Create method
-func (repo *DB) InsertBulkLog(logs *[]domain.Log) error {
-	// Start transaction
-	tx := repo.db.WithContext(context.Background()).Begin()
+func (repo *DB) InsertBulkLog(logs []domain.Log) error {
 
-	// Iterate over logs
-	for _, log := range *logs {
-		// Create record
-		if err := tx.Create(&log).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
-	// Commit transaction
-	err := tx.Commit().Error
+	err := repo.db.WithContext(context.Background()).Create(&logs).Error
 	if err != nil {
+		log.Error(err)
 		return err
 	}
 

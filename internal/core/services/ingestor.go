@@ -85,7 +85,7 @@ func (s *IngestorService) InsertLogWithKafka(logRequest domain.LogRequest, logPr
 	return nil
 }
 
-func (s *IngestorService) InsertBulkLog(logChunk *[]domain.Log) {
+func (s *IngestorService) InsertBulkLog(logChunk []domain.Log) {
 
 	err := s.repo.InsertBulkLog(logChunk)
 	if err != nil {

@@ -76,7 +76,7 @@ func (h *IngestorHandler) IngestLogWithKafka(ctx echo.Context) error {
 	})
 }
 
-func (h *IngestorHandler) IngestBulkLog(logRequest *[]domain.Log) {
+func (h *IngestorHandler) IngestBulkLog(logRequest []domain.Log) {
 	h.ingestorService.InsertBulkLog(logRequest)
 
 	return
