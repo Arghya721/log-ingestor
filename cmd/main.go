@@ -76,6 +76,9 @@ func InitRoutes() {
 	// create a group public
 	public := e.Group("/public")
 
+	// create an internal group
+	internal := e.Group("/internal")
+
 	healthCheckHandler := handler.NewHealthCheckHandler(*healthCheckService)
 	public.GET("/health", healthCheckHandler.HealthCheck)
 
