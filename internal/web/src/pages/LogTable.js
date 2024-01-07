@@ -139,6 +139,7 @@ const LogTable = () => {
                                         timestampEnd: null,
                                     });
                                 }}
+                                maxDate={filterState.timestampEnd}
                             />
                         </Grid>
                         <Grid item xs={12} md={4}>
