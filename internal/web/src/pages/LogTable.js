@@ -10,12 +10,40 @@ const LogTable = () => {
         isLoading: true,
         data: [],
         total: 0,
-        page: 1,
+        page: 0,
         pageSize: 10,
-
     });
 
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 100 },
+        { field: 'level', headerName: 'Level', width: 130 },
+        { field: 'message', headerName: 'Message', width: 400 },
+        { field: 'resourceId' , headerName: 'Resource ID', width: 200 },
+        { field: 'timestamp', headerName: 'Timestamp', width: 200 },
+        { field: 'traceId', headerName: 'Trace ID', width: 200 },
+        { field: 'spanId', headerName: 'Span ID', width: 200 },
+        { field: 'commit' , headerName: 'Commit', width: 200 },
+        { field: 'parentResourceId', headerName: 'Parent Resource ID', width: 200 },
+    ];
 
+    useEffect(() => {
+        const fetchLogs = async () => {
+            setPageState({
+                ...pageState,
+                isLoading: true,
+            });
+            const res = await fetch(`http://localhost:1323/internal/logs?page=${pageState.page}&limit=${pageState.pageSize}`);
+            const data = await res.json();
+            setPageState({
+                ...pageState,
+                isLoading: false,
+                data: data.logs,
+                total: data.total,
+            });
+        }
+        fetchLogs();
+
+    }, [pageState.page, pageState.pageSize]);
 
 
 
@@ -25,18 +53,30 @@ const LogTable = () => {
             <Navbar
                 title="Logs Visualization"
             />
-            <Container style={{ marginTop: 100 , marginBottom: 100 }}>
+            <div style={{
+                marginTop: '100px',
+            }}>
                 <DataGrid
+                    autoHeight
+                    columns={columns}
                     rows={pageState.data}
-                    {...data}
+                    pageSizeOptions={[10, 30, 50, 70, 100]}
                     rowCount={pageState.total}
                     loading={pageState.isLoading}
-                    pageSizeOptions={[5]}
-                    paginationModel={paginationModel}
+                    page={pageState.page}
+                    pageSize={pageState.pageSize}
                     paginationMode="server"
-                    onPaginationModelChange={setPaginationModel}
+                    paginationModel={pageState}
+                    onPaginationModelChange={(newModel) => {
+                        setPageState({
+                            ...pageState,
+                            page: newModel.page,
+                            pageSize: newModel.pageSize,
+                        });
+                        }
+                    }
                 />
-            </Container>
+            </div>
         </div>
     )
 }

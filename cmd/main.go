@@ -25,6 +25,7 @@ func init() {
 var (
 	healthCheckService *services.HealthCheckService
 	logIngestorService *services.IngestorService
+	internalService    *services.InternalService
 	logProducer        *domain.LogProducer
 	logBulk            []domain.Log
 )
@@ -46,6 +47,9 @@ func main() {
 
 	// log ingestor service
 	logIngestorService = services.NewIngestorService(postgresDB)
+
+	// internal api service
+	internalService = services.NewInternalService(postgresDB)
 
 	topic := "topic69"
 
@@ -86,6 +90,9 @@ func InitRoutes() {
 	public.POST("/ingest", ingestorHandler.IngestLog)
 	public.POST("/ingest-prepared-stmt", ingestorHandler.IngestLogWithPreparedStmt)
 	public.POST("/ingest-kafka", ingestorHandler.IngestLogWithKafka)
+
+	internalHandler := handler.NewInternalHandler(*internalService)
+	internal.GET("/logs", internalHandler.GetLogs)
 
 	go processor.ConsumeLog(&logBulk, ingestorHandler)
 

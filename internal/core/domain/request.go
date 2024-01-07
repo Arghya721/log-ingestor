@@ -15,3 +15,9 @@ type LogRequest struct {
 type MetaData struct {
 	ParentResourceID string `json:"parentResourceId"`
 }
+
+// LogFilter is a struct that represents the log filter model
+type LogFilter struct {
+	Page  int
+	Limit int
+}
