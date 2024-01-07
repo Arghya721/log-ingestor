@@ -39,6 +39,21 @@ func (h *InternalHandler) GetLogs(ctx echo.Context) error {
 	}
 	logFilter.Limit = limit
 
+	// get level from query params
+	logFilter.Level = ctx.QueryParam("level")
+
+	// get message from query params
+	logFilter.Message = ctx.QueryParam("message")
+
+	// get resource id from query params
+	logFilter.ResourceId = ctx.QueryParam("resourceId")
+
+	// get timestamp start from query params
+	logFilter.TimestampStart = ctx.QueryParam("timestampStart")
+
+	// get timestamp end from query params
+	logFilter.TimestampEnd = ctx.QueryParam("timestampEnd")
+
 	// get logs
 	logs, err := h.internalService.GetLogs(logFilter)
 	if err != nil {

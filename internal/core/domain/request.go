@@ -18,6 +18,11 @@ type MetaData struct {
 
 // LogFilter is a struct that represents the log filter model
 type LogFilter struct {
-	Page  int
-	Limit int
+	Page           int
+	Limit          int
+	Level          string
+	Message        string
+	ResourceId     string
+	TimestampStart string
+	TimestampEnd   string
 }
