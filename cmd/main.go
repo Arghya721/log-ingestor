@@ -20,6 +20,7 @@ import (
 func init() {
 	config.InitializeConfig()
 	config.GenerateDatabaseURL()
+	config.GetKafkaConfig()
 }
 
 var (
@@ -51,12 +52,10 @@ func main() {
 	// internal api service
 	internalService = services.NewInternalService(postgresDB)
 
-	topic := "topic69"
-
 	// kafka producer
 	kafkaProducer, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
-		"client.id":         "Producer69",
+		"bootstrap.servers": config.KafkaConfig.KafkaConnectionURL,
+		"client.id":         "xyz",
 		"acks":              "all",
 	})
 
@@ -65,7 +64,7 @@ func main() {
 	}
 
 	// create a log producer
-	logProducer = repository.NewLogProducer(kafkaProducer, topic)
+	logProducer = repository.NewLogProducer(kafkaProducer)
 
 	InitRoutes()
 }

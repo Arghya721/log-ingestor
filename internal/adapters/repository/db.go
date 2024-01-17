@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log-ingestor/internal/config"
 	"log-ingestor/internal/core/domain"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -19,10 +20,10 @@ func NewDB(db *gorm.DB) *DB {
 	}
 }
 
-func NewLogProducer(p *kafka.Producer, topic string) *domain.LogProducer {
+func NewLogProducer(p *kafka.Producer) *domain.LogProducer {
 	return &domain.LogProducer{
 		Producer:     p,
-		Topic:        topic,
+		Topic:        config.KafkaConfig.KafkaTopic,
 		DeliveryChan: make(chan kafka.Event, 10000),
 	}
 }

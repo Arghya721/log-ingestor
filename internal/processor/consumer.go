@@ -3,6 +3,7 @@ package processor
 import (
 	"encoding/json"
 	"log-ingestor/internal/adapters/handler"
+	"log-ingestor/internal/config"
 	"log-ingestor/internal/core/domain"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -11,8 +12,8 @@ import (
 
 func ConsumeLog(logChunk *[]domain.Log, ingestorHandler *handler.IngestorHandler) {
 	kafkaConsumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
-		"group.id":          "Producer69",
+		"bootstrap.servers": config.KafkaConfig.KafkaConnectionURL,
+		"group.id":          "xyz",
 		"auto.offset.reset": "smallest",
 	})
 	if err != nil {
@@ -20,7 +21,7 @@ func ConsumeLog(logChunk *[]domain.Log, ingestorHandler *handler.IngestorHandler
 	}
 
 	// Subscribe to topic
-	err = kafkaConsumer.SubscribeTopics([]string{"topic69"}, nil)
+	err = kafkaConsumer.SubscribeTopics([]string{config.KafkaConfig.KafkaTopic}, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
