@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3'
 
 services:
   zoo1:
@@ -7,6 +7,11 @@ services:
     container_name: zoo1
     ports:
       - "2181:2181"
+    healthcheck:
+      test: ["CMD", "bash", "-c", 'kafka-broker-api-versions.sh --bootstrap-server=localhost:9092']
+      interval: 30s
+      timeout: 10s
+      retries: 5
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_SERVER_ID: 1
@@ -34,7 +39,7 @@ services:
       KAFKA_JMX_HOSTNAME: ${DOCKER_HOST_IP:-127.0.0.1}
       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"  # Auto-create topics if not present
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     depends_on:
       - zoo1
 
@@ -51,28 +56,31 @@ services:
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./postgres/data:/var/lib/postgresql/data
-  
+
   db-migration:
     image: migrate/migrate:v4.14.1
     command: -path=/internal/migrations/ -database postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable up
     volumes:
-      - ./postgres/migrations:/migrations
+      - ./internal/migrations:/internal/migrations
     depends_on:
       - postgres
+
 
   log-ingestor:
     build: ./
     ports:
       - "1323:1323"
     environment:
-      DB_HOST: postgres
+      DB_HOST: postgres  # Updated from localhost to postgres
       DB_PORT: 5432
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
       DB_NAME: postgres
       DB_TYPE: postgres
+      DB_SSL_MODE: disable
       KAFKA_CONNECTION_URL: kafka1:9092
       KAFKA_TOPIC: logs
     depends_on:
+      - zoo1
       - kafka1
       - postgres

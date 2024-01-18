@@ -35,10 +35,11 @@ RUN go build -ldflags="-w -s" -o log-ingestor cmd/main.go
 # Use Ubuntu latest for the final image
 FROM ubuntu:latest
 
-# Install runtime dependencies for Kafka (librdkafka)
+# Install runtime dependencies for Kafka (librdkafka) and netcat
 RUN apt-get update && apt-get install -y \
     librdkafka1 \
-    && rm -rf /var/lib/apt/lists/*
+    netcat && rm -rf /var/lib/apt/lists/*
+
 
 # Set the current working directory
 WORKDIR /log-ingestor
@@ -46,8 +47,14 @@ WORKDIR /log-ingestor
 # Copy the binary from the builder stage
 COPY --from=builder /log-ingestor/log-ingestor /log-ingestor
 
+# Copy the wait-for-kafka.sh script into the image
+COPY wait-for-kafka.sh /wait-for-kafka.sh
+
+# Make the wait-for-kafka.sh script executable
+RUN chmod +x /wait-for-kafka.sh
+
 # Expose the necessary port
 EXPOSE 1323
 
-# Command to run the executable
-CMD ["./log-ingestor"]
+# Command to run the wait-for-kafka.sh script and then the executable
+CMD ["/wait-for-kafka.sh", "kafka1", "9092", "./log-ingestor"]

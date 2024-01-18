@@ -13,6 +13,7 @@ type DatabaseConfiguration struct {
 	DbHost      string
 	DbPort      string
 	DatabaseURL string
+	DbSSLMode   string
 }
 
 // DatabaseConfig holds the database configurations after reading it from config file
@@ -27,7 +28,7 @@ func GetDatabaseConfig() {
 	DatabaseConfig.DbName = viper.GetString("DB_NAME")
 	DatabaseConfig.DbHost = viper.GetString("DB_HOST")
 	DatabaseConfig.DbPort = viper.GetString("DB_PORT")
-
+	DatabaseConfig.DbSSLMode = viper.GetString("DB_SSL_MODE")
 }
 
 // GenerateDatabaseURL will generate the url which will be used by our connector
@@ -36,9 +37,10 @@ func GenerateDatabaseURL() {
 	GetDatabaseConfig()
 
 	if DatabaseConfig.DbType == "postgres" {
-		DatabaseConfig.DatabaseURL = "host=" + DatabaseConfig.DbHost + " port=" + DatabaseConfig.DbPort + " user=" + DatabaseConfig.DbUsername + " dbname=" + DatabaseConfig.DbName + " password=" + DatabaseConfig.DbPassword + " sslmode=require"
+		DatabaseConfig.DatabaseURL = "host=" + DatabaseConfig.DbHost + " user=" + DatabaseConfig.DbUsername + " password=" + DatabaseConfig.DbPassword + " dbname=" + DatabaseConfig.DbName + " port=" + DatabaseConfig.DbPort + " sslmode=" + DatabaseConfig.DbSSLMode
 	} else if DatabaseConfig.DbType == "mysql" {
-		DatabaseConfig.DatabaseURL = DatabaseConfig.DbUsername + ":" + DatabaseConfig.DbPassword + "@tcp(" + DatabaseConfig.DbHost + ":" + DatabaseConfig.DbPort + ")/" + DatabaseConfig.DbName + "?charset=utf8&parseTime=True&loc=Local"
+		DatabaseConfig.DatabaseURL = DatabaseConfig.DbUsername + ":" + DatabaseConfig.DbPassword + "@tcp(" + DatabaseConfig.DbHost + ":" + DatabaseConfig.DbPort + ")/" + DatabaseConfig.DbName
+	} else {
+		DatabaseConfig.DatabaseURL = "host=" + DatabaseConfig.DbHost + " user=" + DatabaseConfig.DbUsername + " password=" + DatabaseConfig.DbPassword + " dbname=" + DatabaseConfig.DbName + " port=" + DatabaseConfig.DbPort + " sslmode=" + DatabaseConfig.DbSSLMode
 	}
-
 }
