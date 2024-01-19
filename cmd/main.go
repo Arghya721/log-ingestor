@@ -1,13 +1,14 @@
 package main
 
 import (
-	"log"
 	"log-ingestor/internal/adapters/handler"
 	"log-ingestor/internal/adapters/repository"
 	"log-ingestor/internal/config"
 	"log-ingestor/internal/core/domain"
 	"log-ingestor/internal/core/services"
 	"log-ingestor/internal/processor"
+
+	"github.com/labstack/gommon/log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 
@@ -60,7 +61,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	// create a log producer

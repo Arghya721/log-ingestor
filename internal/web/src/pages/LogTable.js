@@ -5,6 +5,7 @@ import { Grid, TextField } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { getLogTable } from '../api/logTable';
 
 
 const LogTable = () => {
@@ -54,8 +55,14 @@ const LogTable = () => {
                 timestampEnd: filterState.timestampEnd === null ? '' : filterState.timestampEnd,
             };
 
-            const res = await fetch(`http://localhost:1323/internal/logs?` + new URLSearchParams(params).toString());
-            const data = await res.json();
+            const data = await getLogTable(params);
+            if(data === undefined) {
+                setPageState({
+                    ...pageState,
+                    isLoading: false,
+                });
+                return;
+            } 
             setPageState({
                 ...pageState,
                 isLoading: false,

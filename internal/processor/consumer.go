@@ -17,13 +17,13 @@ func ConsumeLog(logChunk *[]domain.Log, ingestorHandler *handler.IngestorHandler
 		"auto.offset.reset": "smallest",
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	// Subscribe to topic
 	err = kafkaConsumer.SubscribeTopics([]string{config.KafkaConfig.KafkaTopic}, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	for {
