@@ -35,11 +35,14 @@ RUN go build -ldflags="-w -s" -o log-ingestor cmd/main.go
 # Use Ubuntu latest for the final image
 FROM ubuntu:latest
 
-# Install runtime dependencies for Kafka (librdkafka) and netcat
+# Install runtime dependencies for Kafka (librdkafka), netcat, and the `migrate` tool
 RUN apt-get update && apt-get install -y \
     librdkafka1 \
-    netcat && rm -rf /var/lib/apt/lists/*
-
+    netcat \
+    curl \
+ && curl -L https://github.com/golang-migrate/migrate/releases/download/v4.14.1/migrate.linux-amd64.tar.gz | tar xvz \
+ && mv migrate.linux-amd64 /usr/local/bin/migrate \
+ && rm -rf /var/lib/apt/lists/*
 
 # Set the current working directory
 WORKDIR /log-ingestor
@@ -47,14 +50,19 @@ WORKDIR /log-ingestor
 # Copy the binary from the builder stage
 COPY --from=builder /log-ingestor/log-ingestor /log-ingestor
 
-# Copy the wait-for-kafka.sh script into the image
-COPY wait-for-kafka.sh /wait-for-kafka.sh
 
-# Make the wait-for-kafka.sh script executable
-RUN chmod +x /wait-for-kafka.sh
+# Copy migration files from the internal/migrations directory
+COPY internal/migrations /migrations
+
+# Copy the wait-for-it.sh script into the image
+COPY wait-for-it.sh /wait-for-it.sh
+
+# Make the wait-for-it.sh script executable
+RUN chmod +x /wait-for-it.sh
 
 # Expose the necessary port
 EXPOSE 1323
 
-# Command to run the wait-for-kafka.sh script and then the executable
-CMD ["/wait-for-kafka.sh", "kafka1", "9092", "./log-ingestor"]
+# Command to run the wait-for-it.sh script for both Kafka and Postgres, then run migrate, and finally the executable
+CMD ["/bin/bash", "-c", "/wait-for-it.sh postgres:5432 --timeout=30 && /wait-for-it.sh kafka1:9092 --timeout=30 && migrate -source=file:///migrations -database postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable up && ./log-ingestor"]
+
