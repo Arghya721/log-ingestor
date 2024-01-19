@@ -94,4 +94,4 @@ services:
     depends_on:
       - log-ingestor
     environment:
-      - REACT_APP_API_URL=http://log-ingestor:1323
+      - REACT_APP_API_HOST_URL=http://log-ingestor:1323
