@@ -17,6 +17,22 @@ It consists of two main components.
 - Database : PostgreSQL
 - Message Broker : Apache Kafka
 
+## System Architecture
+
+![System Architecture](https://raw.githubusercontent.com/Arghya721/log-ingestor/master/system%20architecture%20diagram.png)
+
+**Application** : There are multiple applications each generating log data. These applications represent the sources of the log messages that need to be stored.
+
+**Golang Server** : These applications send their log data to a central Golang server, which operates using the Echo framework. The Golang server acts as the initial collection point for logs, handling incoming requests efficiently.
+
+**Apache Kafka** : The log data is then forwarded from the Golang server to Apache Kafka. Kafka serves as a robust message broker, which queues the incoming log data. It is responsible for managing the log messages, ensuring they are processed and stored reliably.
+
+**Batch Processing** : Apache Kafka aggregates the log messages and pushes them to the database in batches of maximum 2000. This batch processing helps in managing the data flow and reduces the overhead on the database.
+
+**PostgreSQL Database** : The accumulated log messages are stored in a PostgreSQL database. PostgreSQL is a powerful, open-source object-relational database system that provides strong data integrity and supports complex queries.
+
+**ReactJS Frontend** : For log visualization and search, the system features a frontend user interface constructed with ReactJS. This UI is engineered to deliver a seamless experience when searching for and analyzing log data, leveraging Material-UI for table visualizations and data filtering. Additionally, it utilizes server-side pagination, enhancing the real-time log search capabilities by efficiently fetching data in manageable segments from the PostgreSQL database in response to user queries.
+
 ## Installation
 
 #### Recommended : Use Docker compose to start log-ingestor.
@@ -70,6 +86,3 @@ k6 run tools/k6/spike_test.js
 or
 make spike-test
 ```
-  
-
-
