@@ -3,6 +3,7 @@ package handler
 import (
 	"log-ingestor/internal/core/domain"
 	"log-ingestor/internal/core/services"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -33,7 +34,7 @@ func (h *IngestorHandler) IngestLog(ctx echo.Context) error {
 			"message": "Internal Server Error",
 		})
 	}
-	return ctx.JSON(200, map[string]string{
+	return ctx.JSON(http.StatusCreated, map[string]string{
 		"message": "OK",
 	})
 }
@@ -52,7 +53,7 @@ func (h *IngestorHandler) IngestLogWithPreparedStmt(ctx echo.Context) error {
 			"message": "Internal Server Error",
 		})
 	}
-	return ctx.JSON(200, map[string]string{
+	return ctx.JSON(http.StatusCreated, map[string]string{
 		"message": "OK",
 	})
 }
@@ -71,7 +72,7 @@ func (h *IngestorHandler) IngestLogWithKafka(ctx echo.Context) error {
 			"message": "Internal Server Error",
 		})
 	}
-	return ctx.JSON(200, map[string]string{
+	return ctx.JSON(http.StatusCreated, map[string]string{
 		"message": "OK",
 	})
 }
