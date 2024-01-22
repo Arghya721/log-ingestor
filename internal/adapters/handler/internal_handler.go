@@ -5,7 +5,7 @@ import (
 	"log-ingestor/internal/core/services"
 	"strconv"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type InternalHandler struct {

@@ -7,13 +7,15 @@ import (
 	"log-ingestor/internal/core/domain"
 	"log-ingestor/internal/core/services"
 	"log-ingestor/internal/processor"
+	"github.com/labstack/echo-contrib/prometheus"
 
 	"github.com/labstack/gommon/log"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
+	
 
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -76,6 +78,9 @@ func InitRoutes() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
+
+	p := prometheus.NewPrometheus("", nil)
+	p.Use(e)
 
 	// create a group public
 	public := e.Group("/public")

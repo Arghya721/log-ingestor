@@ -4,7 +4,7 @@ import (
 	"log-ingestor/internal/core/domain"
 	"log-ingestor/internal/core/services"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type IngestorHandler struct {

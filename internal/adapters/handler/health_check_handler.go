@@ -3,7 +3,8 @@ package handler
 import (
 	"log-ingestor/internal/core/services"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
+
 )
 
 type HealthCheckHandler struct {
