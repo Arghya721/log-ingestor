@@ -1,91 +1,91 @@
 version: '3'
 
 services:
-#   zoo1:
-#     image: confluentinc/cp-zookeeper:7.3.2
-#     hostname: zoo1
-#     container_name: zoo1
-#     ports:
-#       - "2181:2181"
-#     healthcheck:
-#       test: ["CMD", "bash", "-c", 'kafka-broker-api-versions.sh --bootstrap-server=localhost:9092']
-#       interval: 30s
-#       timeout: 10s
-#       retries: 5
-#     environment:
-#       ZOOKEEPER_CLIENT_PORT: 2181
-#       ZOOKEEPER_SERVER_ID: 1
-#       ZOOKEEPER_SERVERS: zoo1:2888:3888
+  zoo1:
+    image: confluentinc/cp-zookeeper:7.3.2
+    hostname: zoo1
+    container_name: zoo1
+    ports:
+      - "2181:2181"
+    healthcheck:
+      test: ["CMD", "bash", "-c", 'kafka-broker-api-versions.sh --bootstrap-server=localhost:9092']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zoo1:2888:3888
 
-#   kafka1:
-#     image: confluentinc/cp-kafka:7.3.2
-#     hostname: kafka1
-#     container_name: kafka1
-#     ports:
-#       - "9092:9092"
-#       - "29092:29092"
-#       - "9999:9999"
-#     environment:
-#       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://kafka1:9092
-#       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
-#       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-#       KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
-#       KAFKA_BROKER_ID: 1
-#       KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
-#       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-#       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-#       KAFKA_JMX_PORT: 9999
-#       KAFKA_JMX_HOSTNAME: kafka1
-#       KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
-#       KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
-#       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-#     depends_on:
-#       - zoo1
+  kafka1:
+    image: confluentinc/cp-kafka:7.3.2
+    hostname: kafka1
+    container_name: kafka1
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+      - "9999:9999"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:19092,EXTERNAL://kafka1:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zoo1:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: kafka1
+      KAFKA_AUTHORIZER_CLASS_NAME: kafka.security.authorizer.AclAuthorizer
+      KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zoo1
 
-#   postgres:
-#     image: postgres:16.1
-#     hostname: postgres
-#     container_name: postgres
-#     ports:
-#       - "5432:5432"
-#     environment:
-#       POSTGRES_USER: postgres
-#       POSTGRES_PASSWORD: postgres
-#       POSTGRES_DB: postgres
-#     volumes:
-#       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
-#       - ./postgres/data:/var/lib/postgresql/data
+  postgres:
+    image: postgres:16.1
+    hostname: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/data:/var/lib/postgresql/data
 
-#   log-ingestor:
-#     build: ./
-#     ports:
-#       - "1323:1323"
-#     hostname: log-ingestor
-#     environment:
-#       DB_HOST: postgres  # Updated from localhost to postgres
-#       DB_PORT: 5432
-#       DB_USERNAME: postgres
-#       DB_PASSWORD: postgres
-#       DB_NAME: postgres
-#       DB_TYPE: postgres
-#       DB_SSL_MODE: disable
-#       KAFKA_CONNECTION_URL: kafka1:9092
-#       KAFKA_TOPIC: logs
-#     depends_on:
-#       - zoo1
-#       - kafka1
-#       - postgres
+  log-ingestor:
+    build: ./
+    ports:
+      - "3000:1323"
+    hostname: log-ingestor
+    environment:
+      DB_HOST: postgres  # Updated from localhost to postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: postgres
+      DB_TYPE: postgres
+      DB_SSL_MODE: disable
+      KAFKA_CONNECTION_URL: kafka1:9092
+      KAFKA_TOPIC: logs
+    depends_on:
+      - zoo1
+      - kafka1
+      - postgres
 
-#   react-app:
-#     build:
-#       context: ./internal/web
-#     ports:
-#       - "3000:3000"
-#     depends_on:
-#       - log-ingestor
-#     environment:
-#       - REACT_APP_API_HOST_URL=http://localhost:1323
+  react-app:
+    build:
+      context: ./internal/web
+    ports:
+      - "4000:3000"
+    depends_on:
+      - log-ingestor
+    environment:
+      - REACT_APP_API_HOST_URL=http://localhost:3000
 
   prom-server:
     image: prom/prometheus
@@ -94,3 +94,11 @@ services:
     volumes:
       - ./prometheus-config.yml:/etc/prometheus/prometheus.yml
 
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 5000:3000
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana-dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json

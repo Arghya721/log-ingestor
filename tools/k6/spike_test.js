@@ -50,7 +50,7 @@ function generateRandomPayload() {
 
 
 export default () => {
-    let url = 'http://localhost:1323/public/ingest-kafka';
+    let url = 'http://localhost:3000/public/ingest';
 
     let payload = JSON.stringify(generateRandomPayload());
 

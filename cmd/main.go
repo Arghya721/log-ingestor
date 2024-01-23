@@ -35,10 +35,15 @@ var (
 		Help:    "Duration of HTTP requests.",
 		Buckets: prometheus.DefBuckets,
 	}, []string{"method", "route", "status_code"})
+
+	totalRequestCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Name: "http_requests_total",
+		Help: "Number of HTTP requests.",
+	}, []string{"method", "route", "status_code"})
 )
 
 // Custom middleware to monitor request duration
-func ResponseTimeMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func PrometheusMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		startTime := time.Now()
 
@@ -50,6 +55,8 @@ func ResponseTimeMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		// Record the duration in the histogram
 		httpDuration.WithLabelValues(c.Request().Method, c.Path(), strconv.Itoa(c.Response().Status)).Observe(duration.Seconds())
+
+		totalRequestCounter.WithLabelValues(c.Request().Method, c.Path(), strconv.Itoa(c.Response().Status)).Inc()
 
 		return err
 	}
@@ -110,8 +117,11 @@ func InitRoutes() {
 
 	// Register the Prometheus metrics
 	prometheus.MustRegister(httpDuration)
+
+	// Register the request counter
+	prometheus.MustRegister(totalRequestCounter)
 	// Attach the Prometheus middleware
-	e.Use(ResponseTimeMiddleware)
+	e.Use(PrometheusMiddleware)
 
 	e.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
