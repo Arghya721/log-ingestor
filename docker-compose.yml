@@ -102,3 +102,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - ./grafana-dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json
+      - ./dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml
+      - ./datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    depends_on:
+      - prom-server
