@@ -16,6 +16,7 @@ It consists of two main components.
 - Frontend : ReactJs
 - Database : PostgreSQL
 - Message Broker : Apache Kafka
+- Monitoring Tool : Prometheus, Grafana
 
 ## System Architecture
 
@@ -46,8 +47,10 @@ All the servies will be up and running on the following ports :
 ```bash
 Kafka : localhost:9092
 Postgress : localhost:5432
-Log-ingestor-application : localhost:1323
-React Application : localhost:3000
+Log-ingestor-application : localhost:3000
+React Application : localhost:4000
+Prometheus Server : localhost:9090
+Grafana Dashboard : localhost:5000
 ```
 
 ## Endpoints 
@@ -55,7 +58,7 @@ React Application : localhost:3000
 Make a post request to this endpoint for log-ingestion.
 
 ```bash
-http://localhost:1323/public/ingest
+http://localhost:3000/public/ingest-kafka
 ```
 
 JSON Schema of a log request : 
